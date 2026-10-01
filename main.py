@@ -1,12 +1,26 @@
-from fastapi import FastAPI
-from fastapi.responses import HTMLResponse
+from fastapi import FastAPI, Request
+from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 
 app = FastAPI()
 
+templates = Jinja2Templates(directory="templates")
+
 posts = [
-    {"id": 1, "title": "Post 1"},
-    {"id": 2, "title": "Post 2"}
+    {
+        "id": 1, 
+        "author": "Bharat", 
+        "title": "FastAPI is Awesome", 
+        "content": "This framework is really easy to use and super fast", 
+        "date_posted": "01, Oct, 2026"
+    },
+    {
+        "id": 2, 
+        "author": "Jane", 
+        "title": "Python is great for Web Development", 
+        "content": "Python is great for Web Development, and FastAPI makes it even better", 
+        "date_posted": "24, Sep, 2026"
+    }
 ]
 
 class Item(BaseModel):
@@ -15,10 +29,10 @@ class Item(BaseModel):
     is_offer: bool | None = None
 
 
-@app.get("/", response_class=HTMLResponse, include_in_schema=False)
-@app.get("/posts", response_class=HTMLResponse, include_in_schema=False)
-def read_root():
-    return "<h1>Awesome FastAPI</h1>"
+@app.get("/", include_in_schema=False)
+@app.get("/posts", include_in_schema=False)
+def read_root(request: Request):
+    return templates.TemplateResponse(request, "home.html.j2", context={"posts": posts, "title": "Home Page"})
 
 @app.get("/api/posts")
 def get_posts():
