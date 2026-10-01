@@ -1,8 +1,13 @@
 from fastapi import FastAPI
+from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
 
 app = FastAPI()
 
+posts = [
+    {"id": 1, "title": "Post 1"},
+    {"id": 2, "title": "Post 2"}
+]
 
 class Item(BaseModel):
     name: str
@@ -10,9 +15,14 @@ class Item(BaseModel):
     is_offer: bool | None = None
 
 
-@app.get("/")
+@app.get("/", response_class=HTMLResponse, include_in_schema=False)
+@app.get("/posts", response_class=HTMLResponse, include_in_schema=False)
 def read_root():
-    return {"Hello": "World"}
+    return "<h1>Awesome FastAPI</h1>"
+
+@app.get("/api/posts")
+def get_posts():
+    return posts
 
 
 @app.get("/items/{item_id}")
